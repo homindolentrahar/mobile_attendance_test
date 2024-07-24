@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_attendance_test/attendance/bloc/create_attendance_state.dart';
+import 'package:mobile_attendance_test/utils/base_status.dart';
+import 'package:mobile_attendance_test/utils/location_helper.dart';
 
 class CreateAttendanceBloc extends Cubit<CreateAttendanceState> {
   final formKey = GlobalKey<FormBuilderState>();
@@ -28,10 +30,20 @@ class CreateAttendanceBloc extends Cubit<CreateAttendanceState> {
     );
 
     if (image != null) {
-      // Emit the image to UI
-      emit(state.copyWith(
-        image: image,
-      ));
+      emit(state.copyWith(status: BaseStatus.loading));
+
+      final position = await LocationHelper().getCurrentLocation();
+      final addresses = await LocationHelper().getAddressFromPosition(position);
+
+      emit(
+        state.copyWith(
+          status: BaseStatus.success,
+          image: await image.readAsBytes(),
+          address: addresses.firstOrNull,
+          position: position,
+          attendanceAt: DateTime.now(),
+        ),
+      );
     }
   }
 

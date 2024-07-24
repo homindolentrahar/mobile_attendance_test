@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mobile_attendance_test/attendance/bloc/create_attendance_bloc.dart';
+import 'package:mobile_attendance_test/attendance/create_attendance_page.dart';
 import 'package:mobile_attendance_test/home/bloc/home_page_cubit.dart';
 import 'package:mobile_attendance_test/location/master_location_page.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage._({super.key});
+  const HomePage._();
 
   static Widget getPage() {
     return BlocProvider(
@@ -44,7 +46,13 @@ class HomePage extends StatelessWidget {
           Icons.add,
           color: Theme.of(context).colorScheme.onPrimary,
         ),
-        onPressed: () {},
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => CreateAttendancePage.getPage(),
+            ),
+          );
+        },
       ),
       body: SafeArea(
         child: SizedBox(

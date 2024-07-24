@@ -17,9 +17,10 @@ final _privateConstructorUsedError = UnsupportedError(
 /// @nodoc
 mixin _$CreateAttendanceState {
   BaseStatus get status => throw _privateConstructorUsedError;
-  XFile? get image => throw _privateConstructorUsedError;
-  String get title => throw _privateConstructorUsedError;
+  Uint8List? get image => throw _privateConstructorUsedError;
   DateTime? get attendanceAt => throw _privateConstructorUsedError;
+  Placemark? get address => throw _privateConstructorUsedError;
+  LatLng? get position => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $CreateAttendanceStateCopyWith<CreateAttendanceState> get copyWith =>
@@ -33,7 +34,11 @@ abstract class $CreateAttendanceStateCopyWith<$Res> {
       _$CreateAttendanceStateCopyWithImpl<$Res, CreateAttendanceState>;
   @useResult
   $Res call(
-      {BaseStatus status, XFile? image, String title, DateTime? attendanceAt});
+      {BaseStatus status,
+      Uint8List? image,
+      DateTime? attendanceAt,
+      Placemark? address,
+      LatLng? position});
 }
 
 /// @nodoc
@@ -52,8 +57,9 @@ class _$CreateAttendanceStateCopyWithImpl<$Res,
   $Res call({
     Object? status = null,
     Object? image = freezed,
-    Object? title = null,
     Object? attendanceAt = freezed,
+    Object? address = freezed,
+    Object? position = freezed,
   }) {
     return _then(_value.copyWith(
       status: null == status
@@ -63,15 +69,19 @@ class _$CreateAttendanceStateCopyWithImpl<$Res,
       image: freezed == image
           ? _value.image
           : image // ignore: cast_nullable_to_non_nullable
-              as XFile?,
-      title: null == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String,
+              as Uint8List?,
       attendanceAt: freezed == attendanceAt
           ? _value.attendanceAt
           : attendanceAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      address: freezed == address
+          ? _value.address
+          : address // ignore: cast_nullable_to_non_nullable
+              as Placemark?,
+      position: freezed == position
+          ? _value.position
+          : position // ignore: cast_nullable_to_non_nullable
+              as LatLng?,
     ) as $Val);
   }
 }
@@ -86,7 +96,11 @@ abstract class _$$CreateAttendanceStateImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {BaseStatus status, XFile? image, String title, DateTime? attendanceAt});
+      {BaseStatus status,
+      Uint8List? image,
+      DateTime? attendanceAt,
+      Placemark? address,
+      LatLng? position});
 }
 
 /// @nodoc
@@ -103,8 +117,9 @@ class __$$CreateAttendanceStateImplCopyWithImpl<$Res>
   $Res call({
     Object? status = null,
     Object? image = freezed,
-    Object? title = null,
     Object? attendanceAt = freezed,
+    Object? address = freezed,
+    Object? position = freezed,
   }) {
     return _then(_$CreateAttendanceStateImpl(
       status: null == status
@@ -114,42 +129,62 @@ class __$$CreateAttendanceStateImplCopyWithImpl<$Res>
       image: freezed == image
           ? _value.image
           : image // ignore: cast_nullable_to_non_nullable
-              as XFile?,
-      title: null == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String,
+              as Uint8List?,
       attendanceAt: freezed == attendanceAt
           ? _value.attendanceAt
           : attendanceAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      address: freezed == address
+          ? _value.address
+          : address // ignore: cast_nullable_to_non_nullable
+              as Placemark?,
+      position: freezed == position
+          ? _value.position
+          : position // ignore: cast_nullable_to_non_nullable
+              as LatLng?,
     ));
   }
 }
 
 /// @nodoc
 
-class _$CreateAttendanceStateImpl implements _CreateAttendanceState {
+class _$CreateAttendanceStateImpl
+    with DiagnosticableTreeMixin
+    implements _CreateAttendanceState {
   const _$CreateAttendanceStateImpl(
       {this.status = BaseStatus.initial,
       this.image,
-      this.title = "",
-      this.attendanceAt});
+      this.attendanceAt,
+      this.address,
+      this.position});
 
   @override
   @JsonKey()
   final BaseStatus status;
   @override
-  final XFile? image;
-  @override
-  @JsonKey()
-  final String title;
+  final Uint8List? image;
   @override
   final DateTime? attendanceAt;
+  @override
+  final Placemark? address;
+  @override
+  final LatLng? position;
 
   @override
-  String toString() {
-    return 'CreateAttendanceState(status: $status, image: $image, title: $title, attendanceAt: $attendanceAt)';
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'CreateAttendanceState(status: $status, image: $image, attendanceAt: $attendanceAt, address: $address, position: $position)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'CreateAttendanceState'))
+      ..add(DiagnosticsProperty('status', status))
+      ..add(DiagnosticsProperty('image', image))
+      ..add(DiagnosticsProperty('attendanceAt', attendanceAt))
+      ..add(DiagnosticsProperty('address', address))
+      ..add(DiagnosticsProperty('position', position));
   }
 
   @override
@@ -158,15 +193,22 @@ class _$CreateAttendanceStateImpl implements _CreateAttendanceState {
         (other.runtimeType == runtimeType &&
             other is _$CreateAttendanceStateImpl &&
             (identical(other.status, status) || other.status == status) &&
-            (identical(other.image, image) || other.image == image) &&
-            (identical(other.title, title) || other.title == title) &&
+            const DeepCollectionEquality().equals(other.image, image) &&
             (identical(other.attendanceAt, attendanceAt) ||
-                other.attendanceAt == attendanceAt));
+                other.attendanceAt == attendanceAt) &&
+            (identical(other.address, address) || other.address == address) &&
+            (identical(other.position, position) ||
+                other.position == position));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, status, image, title, attendanceAt);
+  int get hashCode => Object.hash(
+      runtimeType,
+      status,
+      const DeepCollectionEquality().hash(image),
+      attendanceAt,
+      address,
+      position);
 
   @JsonKey(ignore: true)
   @override
@@ -179,18 +221,21 @@ class _$CreateAttendanceStateImpl implements _CreateAttendanceState {
 abstract class _CreateAttendanceState implements CreateAttendanceState {
   const factory _CreateAttendanceState(
       {final BaseStatus status,
-      final XFile? image,
-      final String title,
-      final DateTime? attendanceAt}) = _$CreateAttendanceStateImpl;
+      final Uint8List? image,
+      final DateTime? attendanceAt,
+      final Placemark? address,
+      final LatLng? position}) = _$CreateAttendanceStateImpl;
 
   @override
   BaseStatus get status;
   @override
-  XFile? get image;
-  @override
-  String get title;
+  Uint8List? get image;
   @override
   DateTime? get attendanceAt;
+  @override
+  Placemark? get address;
+  @override
+  LatLng? get position;
   @override
   @JsonKey(ignore: true)
   _$$CreateAttendanceStateImplCopyWith<_$CreateAttendanceStateImpl>
