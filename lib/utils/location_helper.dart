@@ -1,8 +1,11 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:mobile_attendance_test/constants/local_constants.dart';
+import 'package:mobile_attendance_test/utils/local_storage_helper.dart';
 
 class LocationHelper {
   Future<bool> _checkLocationService() async {
@@ -55,6 +58,25 @@ class LocationHelper {
     return LatLng(position.latitude, position.longitude);
   }
 
+  Future<LatLng?> getMasterLocation() async {
+    final appSettingBox =
+        LocalStorageHelper.getBox(LocalConstants.appSettingBox);
+    final savedMasterLocation =
+        await appSettingBox.get(LocalConstants.masterLocationKey);
+    LatLng? masterLocation;
+
+    if (savedMasterLocation != null) {
+      masterLocation = LatLng(
+        savedMasterLocation['latitude'] ?? 0,
+        savedMasterLocation['longitude'] ?? 0,
+      );
+    }
+
+    log("Lang: ${masterLocation?.latitude}, Long: ${masterLocation?.longitude}");
+
+    return masterLocation ?? const LatLng(0, 0);
+  }
+
   Future<List<Placemark>> getAddressFromPosition(LatLng? position) async {
     final placemarks = await placemarkFromCoordinates(
       position?.latitude ?? 0,
@@ -65,4 +87,18 @@ class LocationHelper {
 
     return placemarks;
   }
+
+  static LocationSettings locationSettings = const LocationSettings(
+    accuracy: LocationAccuracy.high,
+    distanceFilter: 100,
+  );
+
+  static StreamSubscription<Position> positionStream =
+      Geolocator.getPositionStream(locationSettings: locationSettings).listen(
+    (Position? position) {
+      log(position == null
+          ? 'Position unknown'
+          : '${position.latitude.toString()}, ${position.longitude.toString()}');
+    },
+  );
 }

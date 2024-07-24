@@ -1,11 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mobile_attendance_test/constants/app_constants.dart';
 import 'package:mobile_attendance_test/core/bloc/location_cubit.dart';
 import 'package:mobile_attendance_test/home/home_page.dart';
+import 'package:mobile_attendance_test/model/geofence_data_model.dart';
+import 'package:mobile_attendance_test/utils/geofence_helper.dart';
 import 'package:mobile_attendance_test/utils/local_storage_helper.dart';
+import 'package:mobile_attendance_test/utils/location_helper.dart';
 
 void main() async {
-  LocalStorageHelper.init();
+  await LocalStorageHelper.init();
+
+  final savedMasterLocation = await LocationHelper().getMasterLocation();
+
+  if (savedMasterLocation != null) {
+    await GeofenceHelper().startGeofencingService();
+
+    GeofenceHelper().addGeofence(
+      GeofenceDataModel(
+        id: AppConstants.masterGeofenceArea,
+        latitude: savedMasterLocation.latitude,
+        longitude: savedMasterLocation.longitude,
+        radius: [
+          GeofenceDataRadiusModel(
+            id: AppConstants.masterGeofenceArea,
+            radius: 50,
+          ),
+        ],
+      ),
+    );
+  }
 
   runApp(const AttendanceTest());
 }

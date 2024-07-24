@@ -4,6 +4,7 @@ import 'package:mobile_attendance_test/attendance/bloc/create_attendance_bloc.da
 import 'package:mobile_attendance_test/attendance/create_attendance_page.dart';
 import 'package:mobile_attendance_test/home/bloc/home_page_cubit.dart';
 import 'package:mobile_attendance_test/location/master_location_page.dart';
+import 'package:mobile_attendance_test/utils/geofence_helper.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage._();
@@ -99,6 +100,34 @@ class HomePage extends StatelessWidget {
                       ),
                     ],
                   ),
+                ),
+                const SizedBox(height: 16),
+                StreamBuilder(
+                  stream: GeofenceHelper().geofenceStreamController.stream,
+                  builder: (_, snapshot) {
+                    if (snapshot.hasData) {
+                      return Column(
+                        children: [
+                          Text(
+                            "Latitude: ${snapshot.data?.geofence.latitude}\nLongitude: ${snapshot.data?.geofence.longitude}",
+                            style: const TextStyle(
+                              fontSize: 12,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            "Status: ${snapshot.data?.status}",
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      );
+                    }
+
+                    return const CircularProgressIndicator();
+                  },
                 ),
               ],
             ),

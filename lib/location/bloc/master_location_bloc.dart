@@ -5,8 +5,10 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mobile_attendance_test/constants/app_constants.dart';
 import 'package:mobile_attendance_test/constants/local_constants.dart';
 import 'package:mobile_attendance_test/location/bloc/master_location_state.dart';
+import 'package:mobile_attendance_test/model/geofence_data_model.dart';
 import 'package:mobile_attendance_test/model/marker_model.dart';
 import 'package:mobile_attendance_test/utils/base_status.dart';
+import 'package:mobile_attendance_test/utils/geofence_helper.dart';
 import 'package:mobile_attendance_test/utils/local_storage_helper.dart';
 import 'package:mobile_attendance_test/utils/location_helper.dart';
 
@@ -98,18 +100,28 @@ class MasterLocationCubit extends Cubit<MasterLocationState> {
       {'latitude': position?.latitude, 'longitude': position?.longitude},
     );
 
-    // emit(
-    //   state.copyWith(
-    //     masterLocation: position,
-    //     markers: [
-    //       ...state.markers,
-    //       MarkerModel(
-    //         markerId: AppConstants.masterLocation,
-    //         position: position ?? const LatLng(0.0, 0.0),
-    //       ),
-    //     ],
-    //   ),
-    // );
+    // if (GeofenceHelper().isRunning()) {
+    //   await GeofenceHelper().stopGeofencingService();
+    // }
+
+    GeofenceHelper().pasue();
+    GeofenceHelper().removeGeofence(AppConstants.masterGeofenceArea);
+    GeofenceHelper().addGeofence(
+      GeofenceDataModel(
+        id: AppConstants.masterGeofenceArea,
+        latitude: position?.latitude ?? 0,
+        longitude: position?.longitude ?? 0,
+        radius: [
+          GeofenceDataRadiusModel(
+            id: AppConstants.masterGeofenceArea,
+            radius: 50,
+          ),
+        ],
+      ),
+    );
+    GeofenceHelper().resume();
+    // await GeofenceHelper().startGeofencingService();
+
     await refreshData();
   }
 

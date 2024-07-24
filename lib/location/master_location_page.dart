@@ -146,6 +146,19 @@ class MasterLocationPage extends StatelessWidget {
                     context.read<MasterLocationCubit>().mapController =
                         controller;
                   },
+                  circles: {
+                    Circle(
+                      circleId: const CircleId("master_area"),
+                      center: state.masterLocation ?? const LatLng(0, 0),
+                      fillColor: Theme.of(context)
+                          .colorScheme
+                          .primary
+                          .withOpacity(0.35),
+                      radius: 50,
+                      strokeColor: Colors.transparent,
+                      strokeWidth: 0,
+                    )
+                  },
                 ),
               ),
               Expanded(
