@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -46,9 +47,22 @@ class LocationHelper {
       return null;
     }
 
-    final position = await Geolocator.getCurrentPosition();
+    final position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
     log("Lang: ${position.latitude}, Long: ${position.longitude}");
 
     return LatLng(position.latitude, position.longitude);
+  }
+
+  Future<List<Placemark>> getAddressFromPosition(LatLng? position) async {
+    final placemarks = await placemarkFromCoordinates(
+      position?.latitude ?? 0,
+      position?.longitude ?? 0,
+    );
+
+    log("Addresses: ${placemarks.map((e) => e.toJson()).toList()}");
+
+    return placemarks;
   }
 }

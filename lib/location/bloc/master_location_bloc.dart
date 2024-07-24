@@ -49,11 +49,20 @@ class MasterLocationCubit extends Cubit<MasterLocationState> {
       return;
     }
 
+    final currentAddress = await LocationHelper().getAddressFromPosition(
+      currentLocation,
+    );
+    final masterAddress = await LocationHelper().getAddressFromPosition(
+      masterLocation,
+    );
+
     emit(
       state.copyWith(
         status: BaseStatus.success,
         currentLocation: currentLocation,
+        currentAddress: currentAddress.firstOrNull,
         masterLocation: masterLocation,
+        masterAddress: masterAddress.firstOrNull,
         markers: [
           MarkerModel(
             markerId: AppConstants.currentLocation,
@@ -89,18 +98,19 @@ class MasterLocationCubit extends Cubit<MasterLocationState> {
       {'latitude': position?.latitude, 'longitude': position?.longitude},
     );
 
-    emit(
-      state.copyWith(
-        masterLocation: position,
-        markers: [
-          ...state.markers,
-          MarkerModel(
-            markerId: AppConstants.masterLocation,
-            position: position ?? const LatLng(0.0, 0.0),
-          ),
-        ],
-      ),
-    );
+    // emit(
+    //   state.copyWith(
+    //     masterLocation: position,
+    //     markers: [
+    //       ...state.markers,
+    //       MarkerModel(
+    //         markerId: AppConstants.masterLocation,
+    //         position: position ?? const LatLng(0.0, 0.0),
+    //       ),
+    //     ],
+    //   ),
+    // );
+    await refreshData();
   }
 
   bool checkIsMasterLocationSame(LatLng? position) {

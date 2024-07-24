@@ -19,6 +19,8 @@ mixin _$MasterLocationState {
   BaseStatus get status => throw _privateConstructorUsedError;
   LatLng? get masterLocation => throw _privateConstructorUsedError;
   LatLng? get currentLocation => throw _privateConstructorUsedError;
+  Placemark? get masterAddress => throw _privateConstructorUsedError;
+  Placemark? get currentAddress => throw _privateConstructorUsedError;
   List<MarkerModel> get markers => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
@@ -36,6 +38,8 @@ abstract class $MasterLocationStateCopyWith<$Res> {
       {BaseStatus status,
       LatLng? masterLocation,
       LatLng? currentLocation,
+      Placemark? masterAddress,
+      Placemark? currentAddress,
       List<MarkerModel> markers});
 }
 
@@ -55,6 +59,8 @@ class _$MasterLocationStateCopyWithImpl<$Res, $Val extends MasterLocationState>
     Object? status = null,
     Object? masterLocation = freezed,
     Object? currentLocation = freezed,
+    Object? masterAddress = freezed,
+    Object? currentAddress = freezed,
     Object? markers = null,
   }) {
     return _then(_value.copyWith(
@@ -70,6 +76,14 @@ class _$MasterLocationStateCopyWithImpl<$Res, $Val extends MasterLocationState>
           ? _value.currentLocation
           : currentLocation // ignore: cast_nullable_to_non_nullable
               as LatLng?,
+      masterAddress: freezed == masterAddress
+          ? _value.masterAddress
+          : masterAddress // ignore: cast_nullable_to_non_nullable
+              as Placemark?,
+      currentAddress: freezed == currentAddress
+          ? _value.currentAddress
+          : currentAddress // ignore: cast_nullable_to_non_nullable
+              as Placemark?,
       markers: null == markers
           ? _value.markers
           : markers // ignore: cast_nullable_to_non_nullable
@@ -90,6 +104,8 @@ abstract class _$$MasterLocationStateImplCopyWith<$Res>
       {BaseStatus status,
       LatLng? masterLocation,
       LatLng? currentLocation,
+      Placemark? masterAddress,
+      Placemark? currentAddress,
       List<MarkerModel> markers});
 }
 
@@ -107,6 +123,8 @@ class __$$MasterLocationStateImplCopyWithImpl<$Res>
     Object? status = null,
     Object? masterLocation = freezed,
     Object? currentLocation = freezed,
+    Object? masterAddress = freezed,
+    Object? currentAddress = freezed,
     Object? markers = null,
   }) {
     return _then(_$MasterLocationStateImpl(
@@ -122,6 +140,14 @@ class __$$MasterLocationStateImplCopyWithImpl<$Res>
           ? _value.currentLocation
           : currentLocation // ignore: cast_nullable_to_non_nullable
               as LatLng?,
+      masterAddress: freezed == masterAddress
+          ? _value.masterAddress
+          : masterAddress // ignore: cast_nullable_to_non_nullable
+              as Placemark?,
+      currentAddress: freezed == currentAddress
+          ? _value.currentAddress
+          : currentAddress // ignore: cast_nullable_to_non_nullable
+              as Placemark?,
       markers: null == markers
           ? _value._markers
           : markers // ignore: cast_nullable_to_non_nullable
@@ -137,6 +163,8 @@ class _$MasterLocationStateImpl implements _MasterLocationState {
       {this.status = BaseStatus.initial,
       this.masterLocation,
       this.currentLocation,
+      this.masterAddress,
+      this.currentAddress,
       final List<MarkerModel> markers = const []})
       : _markers = markers;
 
@@ -147,6 +175,10 @@ class _$MasterLocationStateImpl implements _MasterLocationState {
   final LatLng? masterLocation;
   @override
   final LatLng? currentLocation;
+  @override
+  final Placemark? masterAddress;
+  @override
+  final Placemark? currentAddress;
   final List<MarkerModel> _markers;
   @override
   @JsonKey()
@@ -158,7 +190,7 @@ class _$MasterLocationStateImpl implements _MasterLocationState {
 
   @override
   String toString() {
-    return 'MasterLocationState(status: $status, masterLocation: $masterLocation, currentLocation: $currentLocation, markers: $markers)';
+    return 'MasterLocationState(status: $status, masterLocation: $masterLocation, currentLocation: $currentLocation, masterAddress: $masterAddress, currentAddress: $currentAddress, markers: $markers)';
   }
 
   @override
@@ -171,12 +203,22 @@ class _$MasterLocationStateImpl implements _MasterLocationState {
                 other.masterLocation == masterLocation) &&
             (identical(other.currentLocation, currentLocation) ||
                 other.currentLocation == currentLocation) &&
+            (identical(other.masterAddress, masterAddress) ||
+                other.masterAddress == masterAddress) &&
+            (identical(other.currentAddress, currentAddress) ||
+                other.currentAddress == currentAddress) &&
             const DeepCollectionEquality().equals(other._markers, _markers));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, status, masterLocation,
-      currentLocation, const DeepCollectionEquality().hash(_markers));
+  int get hashCode => Object.hash(
+      runtimeType,
+      status,
+      masterLocation,
+      currentLocation,
+      masterAddress,
+      currentAddress,
+      const DeepCollectionEquality().hash(_markers));
 
   @JsonKey(ignore: true)
   @override
@@ -191,6 +233,8 @@ abstract class _MasterLocationState implements MasterLocationState {
       {final BaseStatus status,
       final LatLng? masterLocation,
       final LatLng? currentLocation,
+      final Placemark? masterAddress,
+      final Placemark? currentAddress,
       final List<MarkerModel> markers}) = _$MasterLocationStateImpl;
 
   @override
@@ -199,6 +243,10 @@ abstract class _MasterLocationState implements MasterLocationState {
   LatLng? get masterLocation;
   @override
   LatLng? get currentLocation;
+  @override
+  Placemark? get masterAddress;
+  @override
+  Placemark? get currentAddress;
   @override
   List<MarkerModel> get markers;
   @override

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geocoding_platform_interface/src/models/placemark.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mobile_attendance_test/constants/app_constants.dart';
 import 'package:mobile_attendance_test/location/bloc/master_location_bloc.dart';
 import 'package:mobile_attendance_test/location/bloc/master_location_state.dart';
 import 'package:mobile_attendance_test/utils/base_status.dart';
+import 'package:mobile_attendance_test/utils/extensions/location_extensions.dart';
 
 class MasterLocationPage extends StatelessWidget {
   const MasterLocationPage._();
@@ -169,30 +171,20 @@ class MasterLocationPage extends StatelessWidget {
                       ),
                       Expanded(
                         child: TabBarView(
-                          children: ["Current", "Master"]
-                              .map(
-                                (e) => Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 20,
-                                    vertical: 16,
-                                  ),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        e,
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              )
-                              .toList(),
+                          children: [
+                            _LocationFragment(
+                              title: "Current Location",
+                              position: state.currentLocation,
+                              address: state.currentAddress,
+                              bloc: context.read<MasterLocationCubit>(),
+                            ),
+                            _LocationFragment(
+                              title: "Master Location",
+                              position: state.masterLocation,
+                              address: state.masterAddress,
+                              bloc: context.read<MasterLocationCubit>(),
+                            )
+                          ],
                         ),
                       ),
                     ],
@@ -202,6 +194,69 @@ class MasterLocationPage extends StatelessWidget {
             ],
           );
         }),
+      ),
+    );
+  }
+}
+
+class _LocationFragment extends StatelessWidget {
+  final String title;
+  final MasterLocationCubit bloc;
+  final Placemark? address;
+  final LatLng? position;
+
+  const _LocationFragment({
+    required this.title,
+    required this.bloc,
+    this.address,
+    this.position,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 20,
+        vertical: 16,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      address?.toReadableAddress() ?? "-",
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Theme.of(context).colorScheme.outline,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 16),
+              IconButton(
+                onPressed: () {
+                  // Go to the location
+                },
+                icon: const Icon(Icons.map_outlined),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
