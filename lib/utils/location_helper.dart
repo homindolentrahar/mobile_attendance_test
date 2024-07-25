@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -88,17 +89,20 @@ class LocationHelper {
     return placemarks;
   }
 
+  Future<BitmapDescriptor> getCustomMarkerIcon(String path) async {
+    final assetImage = BitmapDescriptor.fromAssetImage(
+      ImageConfiguration.empty,
+      path,
+    );
+
+    return assetImage;
+  }
+
   static LocationSettings locationSettings = const LocationSettings(
     accuracy: LocationAccuracy.high,
     distanceFilter: 100,
   );
 
-  static StreamSubscription<Position> positionStream =
-      Geolocator.getPositionStream(locationSettings: locationSettings).listen(
-    (Position? position) {
-      log(position == null
-          ? 'Position unknown'
-          : '${position.latitude.toString()}, ${position.longitude.toString()}');
-    },
-  );
+  static Stream<Position> positionStream =
+      Geolocator.getPositionStream(locationSettings: locationSettings);
 }

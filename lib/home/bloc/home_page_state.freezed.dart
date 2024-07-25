@@ -18,6 +18,8 @@ final _privateConstructorUsedError = UnsupportedError(
 mixin _$HomePageState {
   double get langitude => throw _privateConstructorUsedError;
   double get longitude => throw _privateConstructorUsedError;
+  LatLng? get currentLocation => throw _privateConstructorUsedError;
+  bool get isMasterLocationSet => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $HomePageStateCopyWith<HomePageState> get copyWith =>
@@ -30,7 +32,11 @@ abstract class $HomePageStateCopyWith<$Res> {
           HomePageState value, $Res Function(HomePageState) then) =
       _$HomePageStateCopyWithImpl<$Res, HomePageState>;
   @useResult
-  $Res call({double langitude, double longitude});
+  $Res call(
+      {double langitude,
+      double longitude,
+      LatLng? currentLocation,
+      bool isMasterLocationSet});
 }
 
 /// @nodoc
@@ -48,6 +54,8 @@ class _$HomePageStateCopyWithImpl<$Res, $Val extends HomePageState>
   $Res call({
     Object? langitude = null,
     Object? longitude = null,
+    Object? currentLocation = freezed,
+    Object? isMasterLocationSet = null,
   }) {
     return _then(_value.copyWith(
       langitude: null == langitude
@@ -58,6 +66,14 @@ class _$HomePageStateCopyWithImpl<$Res, $Val extends HomePageState>
           ? _value.longitude
           : longitude // ignore: cast_nullable_to_non_nullable
               as double,
+      currentLocation: freezed == currentLocation
+          ? _value.currentLocation
+          : currentLocation // ignore: cast_nullable_to_non_nullable
+              as LatLng?,
+      isMasterLocationSet: null == isMasterLocationSet
+          ? _value.isMasterLocationSet
+          : isMasterLocationSet // ignore: cast_nullable_to_non_nullable
+              as bool,
     ) as $Val);
   }
 }
@@ -70,7 +86,11 @@ abstract class _$$HomePageStateImplCopyWith<$Res>
       __$$HomePageStateImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({double langitude, double longitude});
+  $Res call(
+      {double langitude,
+      double longitude,
+      LatLng? currentLocation,
+      bool isMasterLocationSet});
 }
 
 /// @nodoc
@@ -86,6 +106,8 @@ class __$$HomePageStateImplCopyWithImpl<$Res>
   $Res call({
     Object? langitude = null,
     Object? longitude = null,
+    Object? currentLocation = freezed,
+    Object? isMasterLocationSet = null,
   }) {
     return _then(_$HomePageStateImpl(
       langitude: null == langitude
@@ -96,6 +118,14 @@ class __$$HomePageStateImplCopyWithImpl<$Res>
           ? _value.longitude
           : longitude // ignore: cast_nullable_to_non_nullable
               as double,
+      currentLocation: freezed == currentLocation
+          ? _value.currentLocation
+          : currentLocation // ignore: cast_nullable_to_non_nullable
+              as LatLng?,
+      isMasterLocationSet: null == isMasterLocationSet
+          ? _value.isMasterLocationSet
+          : isMasterLocationSet // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
@@ -103,7 +133,11 @@ class __$$HomePageStateImplCopyWithImpl<$Res>
 /// @nodoc
 
 class _$HomePageStateImpl implements _HomePageState {
-  _$HomePageStateImpl({this.langitude = 0.0, this.longitude = 0.0});
+  _$HomePageStateImpl(
+      {this.langitude = 0.0,
+      this.longitude = 0.0,
+      this.currentLocation,
+      this.isMasterLocationSet = false});
 
   @override
   @JsonKey()
@@ -111,10 +145,15 @@ class _$HomePageStateImpl implements _HomePageState {
   @override
   @JsonKey()
   final double longitude;
+  @override
+  final LatLng? currentLocation;
+  @override
+  @JsonKey()
+  final bool isMasterLocationSet;
 
   @override
   String toString() {
-    return 'HomePageState(langitude: $langitude, longitude: $longitude)';
+    return 'HomePageState(langitude: $langitude, longitude: $longitude, currentLocation: $currentLocation, isMasterLocationSet: $isMasterLocationSet)';
   }
 
   @override
@@ -125,11 +164,16 @@ class _$HomePageStateImpl implements _HomePageState {
             (identical(other.langitude, langitude) ||
                 other.langitude == langitude) &&
             (identical(other.longitude, longitude) ||
-                other.longitude == longitude));
+                other.longitude == longitude) &&
+            (identical(other.currentLocation, currentLocation) ||
+                other.currentLocation == currentLocation) &&
+            (identical(other.isMasterLocationSet, isMasterLocationSet) ||
+                other.isMasterLocationSet == isMasterLocationSet));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, langitude, longitude);
+  int get hashCode => Object.hash(
+      runtimeType, langitude, longitude, currentLocation, isMasterLocationSet);
 
   @JsonKey(ignore: true)
   @override
@@ -139,13 +183,20 @@ class _$HomePageStateImpl implements _HomePageState {
 }
 
 abstract class _HomePageState implements HomePageState {
-  factory _HomePageState({final double langitude, final double longitude}) =
-      _$HomePageStateImpl;
+  factory _HomePageState(
+      {final double langitude,
+      final double longitude,
+      final LatLng? currentLocation,
+      final bool isMasterLocationSet}) = _$HomePageStateImpl;
 
   @override
   double get langitude;
   @override
   double get longitude;
+  @override
+  LatLng? get currentLocation;
+  @override
+  bool get isMasterLocationSet;
   @override
   @JsonKey(ignore: true)
   _$$HomePageStateImplCopyWith<_$HomePageStateImpl> get copyWith =>

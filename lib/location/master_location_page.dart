@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geocoding_platform_interface/src/models/placemark.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mobile_attendance_test/constants/app_constants.dart';
+import 'package:mobile_attendance_test/home/bloc/map_viewer_cubit.dart';
+import 'package:mobile_attendance_test/home/bloc/map_viewer_state.dart';
 import 'package:mobile_attendance_test/location/bloc/master_location_bloc.dart';
 import 'package:mobile_attendance_test/location/bloc/master_location_state.dart';
 import 'package:mobile_attendance_test/utils/base_status.dart';
@@ -12,8 +14,12 @@ class MasterLocationPage extends StatelessWidget {
   const MasterLocationPage._();
 
   static Widget getPage() {
-    return BlocProvider<MasterLocationCubit>(
-      create: (_) => MasterLocationCubit(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<MasterLocationCubit>(
+          create: (_) => MasterLocationCubit(),
+        ),
+      ],
       child: const MasterLocationPage._(),
     );
   }
@@ -29,161 +35,120 @@ class MasterLocationPage extends StatelessWidget {
             fontWeight: FontWeight.w600,
           ),
         ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              context.read<MasterLocationCubit>().refreshData();
-            },
-            icon: const Icon(Icons.refresh),
-          ),
-        ],
       ),
       body: SafeArea(
-        child: BlocBuilder<MasterLocationCubit, MasterLocationState>(
-            builder: (_, state) {
-          if (state.status == BaseStatus.loading ||
-              state.status == BaseStatus.initial) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          } else if (state.status == BaseStatus.error) {
-            return const Center(
-              child: Text("Failed to get location"),
-            );
-          }
-
-          return Column(
-            children: [
-              SizedBox(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height * 0.5,
-                child: GoogleMap(
-                  mapType: MapType.normal,
-                  initialCameraPosition: CameraPosition(
-                    target: LatLng(
-                      state.masterLocation?.latitude ??
-                          state.currentLocation?.latitude ??
-                          0.0,
-                      state.masterLocation?.longitude ??
-                          state.currentLocation?.longitude ??
-                          0.0,
+        child: Column(
+          children: [
+            BlocBuilder<MapViewerCubit, MapViewerState>(
+              builder: (_, state) {
+                return SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height * 0.6,
+                  child: GoogleMap(
+                    initialCameraPosition: CameraPosition(
+                      target: state.currentLocation ??
+                          LatLng(
+                            state.masterLocation?.latitude ?? 0,
+                            state.masterLocation?.longitude ?? 0,
+                          ),
+                      zoom: 17,
                     ),
-                    zoom: 16,
-                  ),
-                  onTap: (postion) {
-                    context
-                        .read<MasterLocationCubit>()
-                        .setMarkerOnTap("master_location", postion);
-                  },
-                  markers: state.markers
-                      .map(
-                        (marker) => Marker(
-                          markerId: MarkerId(marker.markerId),
-                          position: marker.position,
-                          onTap: () {
-                            if (marker.markerId ==
-                                AppConstants.masterLocation) {
-                              if (context
-                                  .read<MasterLocationCubit>()
-                                  .checkIsMasterLocationSame(marker.position)) {
-                                return;
-                              }
-
-                              showDialog(
-                                context: context,
-                                builder: (builderCtx) => AlertDialog(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(5),
-                                  ),
-                                  title: const Text(
-                                    "Master Location",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  content: const Text(
-                                    "Are you sure want to set this location as a Master Location?",
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
-                                      child: const Text("Cancel"),
-                                    ),
-                                    MaterialButton(
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
-                                      textColor: Theme.of(context)
-                                          .colorScheme
-                                          .onPrimary,
-                                      elevation: 0,
-                                      focusElevation: 0,
-                                      highlightElevation: 0,
-                                      shape: const StadiumBorder(),
-                                      onPressed: () {
-                                        context
-                                            .read<MasterLocationCubit>()
-                                            .saveMasterLocation(
-                                                marker.position);
-                                        Navigator.pop(context);
-                                      },
-                                      child: const Text("Confirm"),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }
-                          },
-                        ),
+                    markers: state.markers
+                        .map(
+                          (marker) => Marker(
+                            markerId: MarkerId(marker.markerId),
+                            position: marker.position,
+                            icon:
+                                marker.markerId == AppConstants.currentLocation
+                                    ? BitmapDescriptor.defaultMarkerWithHue(
+                                        BitmapDescriptor.hueAzure,
+                                      )
+                                    : BitmapDescriptor.defaultMarker,
+                            onTap: () {},
+                          ),
+                        )
+                        .toSet(),
+                    polylines: {
+                      Polyline(
+                        polylineId: const PolylineId("master_route"),
+                        color: Theme.of(context).colorScheme.primary,
+                        points: state.polylineCoordinates,
                       )
-                      .toSet(),
-                  onMapCreated: (GoogleMapController controller) {
-                    context.read<MasterLocationCubit>().mapController =
-                        controller;
-                  },
-                  circles: {
-                    Circle(
-                      circleId: const CircleId("master_area"),
-                      center: state.masterLocation ?? const LatLng(0, 0),
-                      fillColor: Theme.of(context)
-                          .colorScheme
-                          .primary
-                          .withOpacity(0.35),
-                      radius: 50,
-                      strokeColor: Colors.transparent,
-                      strokeWidth: 0,
-                    )
-                  },
-                ),
-              ),
-              Expanded(
-                child: DefaultTabController(
-                  initialIndex: 0,
-                  length: 2,
-                  child: Column(
-                    children: [
-                      TabBar(
-                        tabs: ["Current Location", "Master Location"]
-                            .map(
-                              (e) => Tab(
-                                child: Text(
-                                  e,
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                  ),
+                    },
+                    circles: {
+                      Circle(
+                        circleId: const CircleId(
+                          AppConstants.masterGeofenceArea,
+                        ),
+                        center: state.masterLocation ?? const LatLng(0, 0),
+                        fillColor: Theme.of(context)
+                            .colorScheme
+                            .primary
+                            .withOpacity(0.35),
+                        radius: 50,
+                        strokeColor: Colors.transparent,
+                        strokeWidth: 0,
+                      )
+                    },
+                    onTap: (position) {
+                      context.read<MapViewerCubit>().setMarkerOnTap(
+                            AppConstants.masterLocation,
+                            LatLng(
+                              position.latitude,
+                              position.longitude,
+                            ),
+                          );
+
+                      context
+                          .read<MapViewerCubit>()
+                          .saveMasterLocation(position);
+
+                      context.read<MasterLocationCubit>().refreshData();
+                    },
+                    onMapCreated: (GoogleMapController controller) {
+                      context.read<MapViewerCubit>().mapController = controller;
+                    },
+                  ),
+                );
+              },
+            ),
+            Expanded(
+              child: DefaultTabController(
+                initialIndex: 0,
+                length: 2,
+                child: Column(
+                  children: [
+                    TabBar(
+                      tabs: ["Current Location", "Master Location"]
+                          .map(
+                            (e) => Tab(
+                              child: Text(
+                                e,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
-                            )
-                            .toList(),
-                      ),
-                      Expanded(
-                        child: TabBarView(
+                            ),
+                          )
+                          .toList(),
+                    ),
+                    Expanded(
+                      child:
+                          BlocBuilder<MasterLocationCubit, MasterLocationState>(
+                              builder: (_, state) {
+                        if (state.status == BaseStatus.loading ||
+                            state.status == BaseStatus.initial) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        } else if (state.status == BaseStatus.error) {
+                          return const Center(
+                            child: Text("Failed to get location"),
+                          );
+                        }
+
+                        return TabBarView(
                           children: [
                             _LocationFragment(
                               title: "Current Location",
@@ -198,15 +163,15 @@ class MasterLocationPage extends StatelessWidget {
                               bloc: context.read<MasterLocationCubit>(),
                             )
                           ],
-                        ),
-                      ),
-                    ],
-                  ),
+                        );
+                      }),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          );
-        }),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile_attendance_test/constants/app_constants.dart';
-import 'package:mobile_attendance_test/core/bloc/location_cubit.dart';
+import 'package:mobile_attendance_test/home/bloc/map_viewer_cubit.dart';
 import 'package:mobile_attendance_test/home/home_page.dart';
 import 'package:mobile_attendance_test/model/geofence_data_model.dart';
 import 'package:mobile_attendance_test/utils/geofence_helper.dart';
@@ -39,9 +39,9 @@ class AttendanceTest extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<LocationCubit>(
-      lazy: false,
-      create: (_) => LocationCubit(),
+    return BlocProvider<MapViewerCubit>(
+      lazy: true,
+      create: (_) => MapViewerCubit(),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Attendance Test',
