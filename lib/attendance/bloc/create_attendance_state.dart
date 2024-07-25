@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mobile_attendance_test/utils/base_status.dart';
 
@@ -12,7 +11,8 @@ class CreateAttendanceState with _$CreateAttendanceState {
     @Default(BaseStatus.initial) BaseStatus status,
     Uint8List? image,
     DateTime? attendanceAt,
-    Placemark? address,
+    String? address,
     LatLng? position,
+    @Default(false) bool isEdit,
   }) = _CreateAttendanceState;
 }

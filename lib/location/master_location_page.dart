@@ -5,7 +5,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mobile_attendance_test/constants/app_constants.dart';
 import 'package:mobile_attendance_test/home/bloc/map_viewer_cubit.dart';
 import 'package:mobile_attendance_test/home/bloc/map_viewer_state.dart';
-import 'package:mobile_attendance_test/location/bloc/master_location_bloc.dart';
+import 'package:mobile_attendance_test/location/bloc/master_location_cubit.dart';
 import 'package:mobile_attendance_test/location/bloc/master_location_state.dart';
 import 'package:mobile_attendance_test/utils/base_status.dart';
 import 'package:mobile_attendance_test/utils/extensions/location_extensions.dart';
@@ -46,11 +46,14 @@ class MasterLocationPage extends StatelessWidget {
                   height: MediaQuery.of(context).size.height * 0.6,
                   child: GoogleMap(
                     initialCameraPosition: CameraPosition(
-                      target: state.currentLocation ??
-                          LatLng(
-                            state.masterLocation?.latitude ?? 0,
-                            state.masterLocation?.longitude ?? 0,
-                          ),
+                      target: LatLng(
+                        state.currentLocation?.latitude ??
+                            state.masterLocation?.latitude ??
+                            0,
+                        state.currentLocation?.longitude ??
+                            state.masterLocation?.longitude ??
+                            0,
+                      ),
                       zoom: 17,
                     ),
                     markers: state.markers
@@ -200,37 +203,24 @@ class _LocationFragment extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      address?.toReadableAddress() ?? "-",
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Theme.of(context).colorScheme.outline,
-                      ),
-                    ),
-                  ],
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
-              const SizedBox(width: 16),
-              IconButton(
-                onPressed: () {
-                  // Go to the location
-                },
-                icon: const Icon(Icons.map_outlined),
+              const SizedBox(height: 4),
+              Text(
+                address?.toReadableAddress() ?? "-",
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Theme.of(context).colorScheme.outline,
+                ),
               ),
             ],
           ),

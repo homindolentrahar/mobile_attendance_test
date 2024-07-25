@@ -1,5 +1,8 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geofence_service/geofence_service.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mobile_attendance_test/attendance/create_attendance_page.dart';
 import 'package:mobile_attendance_test/constants/app_constants.dart';
@@ -9,6 +12,8 @@ import 'package:mobile_attendance_test/home/bloc/map_viewer_cubit.dart';
 import 'package:mobile_attendance_test/home/bloc/map_viewer_state.dart';
 import 'package:mobile_attendance_test/location/master_location_page.dart';
 import 'package:mobile_attendance_test/utils/base_status.dart';
+import 'package:mobile_attendance_test/utils/extensions/date_extensions.dart';
+import 'package:mobile_attendance_test/utils/geofence_helper.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage._();
@@ -48,21 +53,44 @@ class HomePage extends StatelessWidget {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Theme.of(context).primaryColor,
-        shape: const CircleBorder(),
-        child: Icon(
-          Icons.add,
-          color: Theme.of(context).colorScheme.onPrimary,
-        ),
-        onPressed: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => CreateAttendancePage.getPage(),
-            ),
-          );
-        },
-      ),
+      floatingActionButton: StreamBuilder(
+          stream: GeofenceHelper().geofenceStreamController.stream,
+          builder: (_, snapshot) {
+            log("Snapshot: ${snapshot.data?.status}");
+
+            if (snapshot.data?.status == GeofenceStatus.ENTER) {
+              return FloatingActionButton(
+                backgroundColor: Theme.of(context).primaryColor,
+                shape: const CircleBorder(),
+                child: Icon(
+                  Icons.add,
+                  color: Theme.of(context).colorScheme.onPrimary,
+                ),
+                onPressed: () async {
+                  final bool? isAdd = await Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => CreateAttendancePage.getPage(),
+                    ),
+                  );
+
+                  log("isAdd: $isAdd");
+
+                  if (isAdd != null && isAdd) {
+                    if (context.mounted) {
+                      context.read<HomePageCubit>().getAttendanceList();
+                    }
+                  }
+                },
+              );
+            }
+
+            return const FloatingActionButton.extended(
+              elevation: 0,
+              disabledElevation: 0,
+              onPressed: null,
+              label: Text("Not in attendance area"),
+            );
+          }),
       body: SafeArea(
         child: SizedBox(
           width: MediaQuery.of(context).size.width,
@@ -71,11 +99,11 @@ class HomePage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                BlocBuilder<HomePageCubit, HomePageState>(
-                  builder: (_, homeState) {
-                    return homeState.isMasterLocationSet
-                        ? BlocBuilder<MapViewerCubit, MapViewerState>(
-                            builder: (_, state) {
+                BlocBuilder<MapViewerCubit, MapViewerState>(
+                  builder: (_, state) {
+                    return state.masterLocation != null
+                        ? Builder(
+                            builder: (_) {
                               if (state.status == BaseStatus.loading ||
                                   state.status == BaseStatus.initial) {
                                 return const Center(
@@ -149,21 +177,7 @@ class HomePage extends StatelessWidget {
                                           strokeWidth: 0,
                                         )
                                       },
-                                      onTap: (position) {
-                                        // context
-                                        //     .read<MapViewerCubit>()
-                                        //     .setMarkerOnTap(
-                                        //       AppConstants.masterLocation,
-                                        //       LatLng(
-                                        //         position.latitude,
-                                        //         position.longitude,
-                                        //       ),
-                                        //     );
-
-                                        // context
-                                        //     .read<MapViewerCubit>()
-                                        //     .saveMasterLocation(position);
-                                      },
+                                      onTap: (position) {},
                                       onMapCreated:
                                           (GoogleMapController controller) {
                                         context
@@ -232,10 +246,55 @@ class HomePage extends StatelessWidget {
                   },
                 ),
                 const SizedBox(height: 16),
-                const Expanded(
-                  child: Center(
-                    child: Text("No Attendance data yet!"),
-                  ),
+                Expanded(
+                  child: BlocBuilder<HomePageCubit, HomePageState>(
+                      builder: (_, state) {
+                    if (state.status == BaseStatus.loading) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    } else if (state.status == BaseStatus.success) {
+                      return ListView.separated(
+                        itemCount: state.attendances.length,
+                        separatorBuilder: (_, index) => const Divider(),
+                        itemBuilder: (_, index) {
+                          final attendance = state.attendances[index];
+
+                          return ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            title: Text(
+                              attendance.timestamp.toFormattedString(),
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            subtitle: Text(
+                              "(${attendance.latitude}, ${attendance.longitude})\n${attendance.address}",
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Theme.of(context).colorScheme.outline,
+                              ),
+                            ),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => CreateAttendancePage.getPage(
+                                    initialData: attendance,
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      );
+                    }
+
+                    return const Center(
+                      child: Text("No Attendance data yet!"),
+                    );
+                  }),
                 ),
               ],
             ),

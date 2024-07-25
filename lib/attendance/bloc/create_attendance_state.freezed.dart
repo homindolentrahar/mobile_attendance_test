@@ -19,8 +19,9 @@ mixin _$CreateAttendanceState {
   BaseStatus get status => throw _privateConstructorUsedError;
   Uint8List? get image => throw _privateConstructorUsedError;
   DateTime? get attendanceAt => throw _privateConstructorUsedError;
-  Placemark? get address => throw _privateConstructorUsedError;
+  String? get address => throw _privateConstructorUsedError;
   LatLng? get position => throw _privateConstructorUsedError;
+  bool get isEdit => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $CreateAttendanceStateCopyWith<CreateAttendanceState> get copyWith =>
@@ -37,8 +38,9 @@ abstract class $CreateAttendanceStateCopyWith<$Res> {
       {BaseStatus status,
       Uint8List? image,
       DateTime? attendanceAt,
-      Placemark? address,
-      LatLng? position});
+      String? address,
+      LatLng? position,
+      bool isEdit});
 }
 
 /// @nodoc
@@ -60,6 +62,7 @@ class _$CreateAttendanceStateCopyWithImpl<$Res,
     Object? attendanceAt = freezed,
     Object? address = freezed,
     Object? position = freezed,
+    Object? isEdit = null,
   }) {
     return _then(_value.copyWith(
       status: null == status
@@ -77,11 +80,15 @@ class _$CreateAttendanceStateCopyWithImpl<$Res,
       address: freezed == address
           ? _value.address
           : address // ignore: cast_nullable_to_non_nullable
-              as Placemark?,
+              as String?,
       position: freezed == position
           ? _value.position
           : position // ignore: cast_nullable_to_non_nullable
               as LatLng?,
+      isEdit: null == isEdit
+          ? _value.isEdit
+          : isEdit // ignore: cast_nullable_to_non_nullable
+              as bool,
     ) as $Val);
   }
 }
@@ -99,8 +106,9 @@ abstract class _$$CreateAttendanceStateImplCopyWith<$Res>
       {BaseStatus status,
       Uint8List? image,
       DateTime? attendanceAt,
-      Placemark? address,
-      LatLng? position});
+      String? address,
+      LatLng? position,
+      bool isEdit});
 }
 
 /// @nodoc
@@ -120,6 +128,7 @@ class __$$CreateAttendanceStateImplCopyWithImpl<$Res>
     Object? attendanceAt = freezed,
     Object? address = freezed,
     Object? position = freezed,
+    Object? isEdit = null,
   }) {
     return _then(_$CreateAttendanceStateImpl(
       status: null == status
@@ -137,11 +146,15 @@ class __$$CreateAttendanceStateImplCopyWithImpl<$Res>
       address: freezed == address
           ? _value.address
           : address // ignore: cast_nullable_to_non_nullable
-              as Placemark?,
+              as String?,
       position: freezed == position
           ? _value.position
           : position // ignore: cast_nullable_to_non_nullable
               as LatLng?,
+      isEdit: null == isEdit
+          ? _value.isEdit
+          : isEdit // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
@@ -156,7 +169,8 @@ class _$CreateAttendanceStateImpl
       this.image,
       this.attendanceAt,
       this.address,
-      this.position});
+      this.position,
+      this.isEdit = false});
 
   @override
   @JsonKey()
@@ -166,13 +180,16 @@ class _$CreateAttendanceStateImpl
   @override
   final DateTime? attendanceAt;
   @override
-  final Placemark? address;
+  final String? address;
   @override
   final LatLng? position;
+  @override
+  @JsonKey()
+  final bool isEdit;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'CreateAttendanceState(status: $status, image: $image, attendanceAt: $attendanceAt, address: $address, position: $position)';
+    return 'CreateAttendanceState(status: $status, image: $image, attendanceAt: $attendanceAt, address: $address, position: $position, isEdit: $isEdit)';
   }
 
   @override
@@ -184,7 +201,8 @@ class _$CreateAttendanceStateImpl
       ..add(DiagnosticsProperty('image', image))
       ..add(DiagnosticsProperty('attendanceAt', attendanceAt))
       ..add(DiagnosticsProperty('address', address))
-      ..add(DiagnosticsProperty('position', position));
+      ..add(DiagnosticsProperty('position', position))
+      ..add(DiagnosticsProperty('isEdit', isEdit));
   }
 
   @override
@@ -198,7 +216,8 @@ class _$CreateAttendanceStateImpl
                 other.attendanceAt == attendanceAt) &&
             (identical(other.address, address) || other.address == address) &&
             (identical(other.position, position) ||
-                other.position == position));
+                other.position == position) &&
+            (identical(other.isEdit, isEdit) || other.isEdit == isEdit));
   }
 
   @override
@@ -208,7 +227,8 @@ class _$CreateAttendanceStateImpl
       const DeepCollectionEquality().hash(image),
       attendanceAt,
       address,
-      position);
+      position,
+      isEdit);
 
   @JsonKey(ignore: true)
   @override
@@ -223,8 +243,9 @@ abstract class _CreateAttendanceState implements CreateAttendanceState {
       {final BaseStatus status,
       final Uint8List? image,
       final DateTime? attendanceAt,
-      final Placemark? address,
-      final LatLng? position}) = _$CreateAttendanceStateImpl;
+      final String? address,
+      final LatLng? position,
+      final bool isEdit}) = _$CreateAttendanceStateImpl;
 
   @override
   BaseStatus get status;
@@ -233,9 +254,11 @@ abstract class _CreateAttendanceState implements CreateAttendanceState {
   @override
   DateTime? get attendanceAt;
   @override
-  Placemark? get address;
+  String? get address;
   @override
   LatLng? get position;
+  @override
+  bool get isEdit;
   @override
   @JsonKey(ignore: true)
   _$$CreateAttendanceStateImplCopyWith<_$CreateAttendanceStateImpl>

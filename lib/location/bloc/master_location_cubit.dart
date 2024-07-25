@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mobile_attendance_test/constants/local_constants.dart';
 import 'package:mobile_attendance_test/location/bloc/master_location_state.dart';
@@ -39,20 +40,26 @@ class MasterLocationCubit extends Cubit<MasterLocationState> {
       return;
     }
 
-    final currentAddress = await LocationHelper().getAddressFromPosition(
+    Placemark? masterAddress;
+    final currentAddress = (await LocationHelper().getAddressFromPosition(
       currentLocation,
-    );
-    final masterAddress = await LocationHelper().getAddressFromPosition(
-      masterLocation,
-    );
+    ))
+        .firstOrNull;
+
+    if (savedMasterLocation != null) {
+      masterAddress = (await LocationHelper().getAddressFromPosition(
+        masterLocation,
+      ))
+          .firstOrNull;
+    }
 
     emit(
       state.copyWith(
         status: BaseStatus.success,
         currentLocation: currentLocation,
-        currentAddress: currentAddress.firstOrNull,
+        currentAddress: currentAddress,
         masterLocation: masterLocation,
-        masterAddress: masterAddress.firstOrNull,
+        masterAddress: masterAddress,
       ),
     );
   }

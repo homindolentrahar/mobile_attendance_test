@@ -9,34 +9,32 @@ import 'package:mobile_attendance_test/constants/local_constants.dart';
 import 'package:mobile_attendance_test/utils/local_storage_helper.dart';
 
 class LocationHelper {
-  Future<bool> _checkLocationService() async {
+  Future<bool> checkAndEnableAllPermission() async {
     log("Checking location service");
-    final isServiceEnabled = await Geolocator.isLocationServiceEnabled();
+
+    bool isServiceEnabled;
+    LocationPermission permission;
+
+    isServiceEnabled = await Geolocator.isLocationServiceEnabled();
 
     if (!isServiceEnabled) {
       log("Location service is disabled");
-
-      return Geolocator.openLocationSettings().then((value) async {
-        log("From settings");
-        return await _checkLocationService();
-      });
+      return Geolocator.openLocationSettings();
     }
 
-    return true & await _checkLocationPermission();
-  }
-
-  Future<bool> _checkLocationPermission() async {
-    log("Checking location permission");
-    LocationPermission permission = await Geolocator.checkPermission();
-
+    permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
-      log("Location permission is denied");
+      log("Location service is denied");
       permission = await Geolocator.requestPermission();
-      return false;
+
+      if (permission == LocationPermission.denied) {
+        log("Location service is denied again");
+        return false;
+      }
     }
 
     if (permission == LocationPermission.deniedForever) {
-      log("Location permission is denied permanently");
+      log("Location service is denied permanently");
       return false;
     }
 
@@ -44,7 +42,7 @@ class LocationHelper {
   }
 
   Future<LatLng?> getCurrentLocation() async {
-    final isServiceEnabled = await _checkLocationService();
+    final isServiceEnabled = await checkAndEnableAllPermission();
 
     if (!isServiceEnabled) {
       log("Enable service & permission first!");
@@ -73,9 +71,7 @@ class LocationHelper {
       );
     }
 
-    log("Lang: ${masterLocation?.latitude}, Long: ${masterLocation?.longitude}");
-
-    return masterLocation ?? const LatLng(0, 0);
+    return masterLocation;
   }
 
   Future<List<Placemark>> getAddressFromPosition(LatLng? position) async {

@@ -50,6 +50,8 @@ dependencies:
   # flutter_background_geolocation: ^4.15.5
   flutter_polyline_points: ^2.0.0
   location: ^6.0.2
+  uuid: ^4.4.2
+  rxdart: ^0.28.0
 
 dev_dependencies:
   flutter_test:

@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:flutter/foundation.dart';
 import 'package:geofence_service/geofence_service.dart';
 import 'package:mobile_attendance_test/model/geofence_data_model.dart';
+import 'package:rxdart/rxdart.dart';
 
 class GeofenceData {
   final Geofence geofence;
@@ -21,7 +22,7 @@ class GeofenceHelper {
   GeofenceService? _geofenceService;
   static GeofenceHelper? _instance;
   final StreamController<GeofenceData> geofenceStreamController =
-      StreamController.broadcast();
+      BehaviorSubject<GeofenceData>();
 
   GeofenceHelper._() {
     _geofenceService = _setupGeofence();
@@ -90,8 +91,6 @@ class GeofenceHelper {
   }
 
   Future<void> stopGeofencingService() async {
-    geofenceStreamController.close();
-
     _geofenceService
         ?.removeGeofenceStatusChangeListener(_onGeofenceStatusChanged);
     _geofenceService?.removeLocationChangeListener(_onLocationChanged);

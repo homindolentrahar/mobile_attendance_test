@@ -13,15 +13,23 @@ import 'package:mobile_attendance_test/model/marker_model.dart';
 import 'package:mobile_attendance_test/utils/base_status.dart';
 import 'package:mobile_attendance_test/utils/geofence_helper.dart';
 import 'package:mobile_attendance_test/utils/local_storage_helper.dart';
+import 'package:mobile_attendance_test/utils/location_helper.dart';
 
 class MapViewerCubit extends Cubit<MapViewerState> {
   MapViewerCubit() : super(MapViewerState()) {
-    refreshData();
-
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       Location.instance.onLocationChanged.listen(
         (position) {
-          log("Stream Position: ${position.latitude}, ${position.longitude}");
+          log("State Position: ${position.latitude}, ${position.longitude}");
+
+          emit(
+            state.copyWith(
+              currentLocation: LatLng(
+                position.latitude ?? 0,
+                position.longitude ?? 0,
+              ),
+            ),
+          );
 
           setMarkerOnTap(
             AppConstants.currentLocation,
@@ -38,6 +46,8 @@ class MapViewerCubit extends Cubit<MapViewerState> {
         },
       );
     });
+
+    refreshData();
   }
 
   GoogleMapController? mapController;
@@ -76,40 +86,25 @@ class MapViewerCubit extends Cubit<MapViewerState> {
   Future<void> setInitialLocation() async {
     emit(state.copyWith(status: BaseStatus.loading));
 
-    // final currentLocation = await LocationHelper().getCurrentLocation();
+    final currentLocation = await LocationHelper().getCurrentLocation();
     final savedMasterLocation =
         await appSettingBox.get(LocalConstants.masterLocationKey);
-    LatLng? masterLocation;
+    LatLng? masterLocation = currentLocation;
 
     if (savedMasterLocation != null) {
       masterLocation = LatLng(
         savedMasterLocation['latitude'] ?? 0,
         savedMasterLocation['longitude'] ?? 0,
       );
+    } else {
+      saveMasterLocation(masterLocation);
     }
-
-    log("Master Location: ${masterLocation?.latitude}, ${masterLocation?.longitude}");
-
-    // if (currentLocation == null) {
-    //   emit(
-    //     state.copyWith(
-    //       status: BaseStatus.error,
-    //     ),
-    //   );
-
-    //   return;
-    // }
 
     emit(
       state.copyWith(
         status: BaseStatus.success,
-        // currentLocation: currentLocation,
         masterLocation: masterLocation,
         markers: [
-          // MarkerModel(
-          //   markerId: AppConstants.currentLocation,
-          //   position: currentLocation,
-          // ),
           if (masterLocation != null)
             MarkerModel(
               markerId: AppConstants.masterLocation,
@@ -121,6 +116,7 @@ class MapViewerCubit extends Cubit<MapViewerState> {
   }
 
   Future<void> setMarkerOnTap(String id, LatLng? position) async {
+    log("Setting marker on tap: $id, ${position?.latitude}, ${position?.longitude}");
     final savedMarkers = List<MarkerModel>.from(state.markers);
 
     if (savedMarkers.any((element) => element.markerId == id)) {
@@ -147,12 +143,12 @@ class MapViewerCubit extends Cubit<MapViewerState> {
       {'latitude': position?.latitude, 'longitude': position?.longitude},
     );
 
-    // if (GeofenceHelper().isRunning()) {
-    //   await GeofenceHelper().stopGeofencingService();
-    // }
+    if (GeofenceHelper().isRunning()) {
+      await GeofenceHelper().stopGeofencingService();
+    }
 
-    GeofenceHelper().pasue();
-    GeofenceHelper().removeGeofence(AppConstants.masterGeofenceArea);
+    // GeofenceHelper().pasue();
+    // GeofenceHelper().removeGeofence(AppConstants.masterGeofenceArea);
     GeofenceHelper().addGeofence(
       GeofenceDataModel(
         id: AppConstants.masterGeofenceArea,
@@ -166,8 +162,8 @@ class MapViewerCubit extends Cubit<MapViewerState> {
         ],
       ),
     );
-    GeofenceHelper().resume();
-    // await GeofenceHelper().startGeofencingService();
+    // GeofenceHelper().resume();
+    await GeofenceHelper().startGeofencingService();
 
     emit(
       state.copyWith(

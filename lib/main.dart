@@ -11,6 +11,7 @@ import 'package:mobile_attendance_test/utils/location_helper.dart';
 void main() async {
   await LocalStorageHelper.init();
 
+  await LocationHelper().checkAndEnableAllPermission();
   final savedMasterLocation = await LocationHelper().getMasterLocation();
 
   if (savedMasterLocation != null) {
@@ -40,7 +41,7 @@ class AttendanceTest extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider<MapViewerCubit>(
-      lazy: true,
+      lazy: false,
       create: (_) => MapViewerCubit(),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
